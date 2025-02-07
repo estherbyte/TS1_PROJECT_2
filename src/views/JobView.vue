@@ -65,7 +65,6 @@ onMounted(async () => {
         },
       }
     );
-    console.log(response.data.record.jobs.filter((job) => job.id == jobId));
     state.job = response.data.record.jobs.filter((job) => job.id == jobId)[0];
   } catch (error) {
     console.error("Error fetching job", error);
