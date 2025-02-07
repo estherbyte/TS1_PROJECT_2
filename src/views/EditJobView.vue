@@ -30,6 +30,8 @@ const state = reactive({
 
 const toast = useToast();
 
+let completeData = {};
+
 const handleSubmit = async () => {
   const updatedJob = {
     title: form.title,
@@ -46,9 +48,23 @@ const handleSubmit = async () => {
   };
 
   try {
-    const response = await axios.put(`/api/jobs/${jobId}`, updatedJob);
+    let jobIndex = completeData.jobs.findIndex((job) => job.id == jobId);
+    updatedJob.id = jobId;
+    completeData.jobs[jobIndex] = updatedJob;
+    await axios.put(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      completeData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
+    // const response = await axios.put(`/api/jobs/${jobId}`, updatedJob);
     toast.success("Job Updated Successfully");
-    router.push(`/jobs/${response.data.id}`);
+    router.push(`/jobs/${jobId}`);
   } catch (error) {
     console.error("Error fetching job", error);
     toast.error("Job Was Not Updateded");
@@ -56,7 +72,19 @@ const handleSubmit = async () => {
 };
 onMounted(async () => {
   try {
-    state.job = JSON.parse(localStorage.getItem("jobs")).jobs[jobId];
+    const response = await axios.get(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      {
+        headers: {
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
+    completeData = response.data.record;
+
+    let jobIndex = completeData.jobs.findIndex((job) => job.id == jobId);
+    state.job = completeData.jobs[jobIndex];
     //Populate inputs
     form.type = state.job.type;
     form.title = state.job.title;

@@ -20,14 +20,31 @@ const deleteJob = async () => {
   try {
     const confirm = window.confirm("Are you sure you want to delete this job?");
     if (confirm) {
-      const response = JSON.parse(localStorage.getItem("jobs")).jobs;
-      console.log(response);
-      const index = response.jobs.indexOf(jobId);
-      if (index > -1) {
-        // only splice array when item is found
-        response.jobs.splice(index, 1); // 2nd parameter means remove one item only
-      }
-      localStorage.setItem("jobs", JSON.stringify(response));
+      const allResponse = await axios.get(
+        "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+        {
+          headers: {
+            "X-Master-Key":
+              "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+          },
+        }
+      );
+      let completeData = allResponse.data.record;
+
+      let jobIndex = completeData.jobs.findIndex((job) => job.id == jobId);
+      completeData.jobs.splice(jobIndex, 1);
+
+      await axios.put(
+        "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+        completeData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key":
+              "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+          },
+        }
+      );
       toast.success("Job Deleted Successfully");
       router.push("/jobs");
     }
@@ -39,7 +56,17 @@ const deleteJob = async () => {
 
 onMounted(async () => {
   try {
-    state.job = JSON.parse(localStorage.getItem("jobs")).jobs[jobId];
+    const response = await axios.get(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      {
+        headers: {
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
+    console.log(response.data.record.jobs.filter((job) => job.id == jobId));
+    state.job = response.data.record.jobs.filter((job) => job.id == jobId)[0];
   } catch (error) {
     console.error("Error fetching job", error);
   } finally {

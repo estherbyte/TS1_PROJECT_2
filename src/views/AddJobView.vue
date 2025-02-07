@@ -3,7 +3,6 @@ import router from "@/router";
 import { reactive } from "vue";
 import { useToast } from "vue-toastification";
 import axios from "axios";
-import { stringify } from "postcss";
 
 const form = reactive({
   type: "Full-Time",
@@ -19,6 +18,8 @@ const form = reactive({
   },
 });
 const toast = useToast();
+let completeData = {};
+
 const handleSubmit = async () => {
   const newJob = {
     title: form.title,
@@ -35,15 +36,34 @@ const handleSubmit = async () => {
   };
 
   try {
-    let data = JSON.parse(localStorage.getItem("jobs")).jobs;
-    const dataCount = data.length;
-    newJob.id = dataCount.toString();
-    data.push(newJob);
-    console.log("Response upon add --", data);
-    localStorage.setItem("jobs", JSON.stringify(data));
+    const allResponse = await axios.get(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      {
+        headers: {
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
+    let completeData = allResponse.data.record;
+    newJob.id =
+      parseInt(completeData.jobs[completeData.jobs.length - 1].id) + 1;
+    completeData.jobs.push(newJob);
+
+    const response = await axios.put(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      completeData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
 
     toast.success("Job Added Successfully");
-    router.push(`/jobs/${dataCount}`);
+    router.push(`/jobs/${newJob.id}`);
   } catch (error) {
     console.error("Error fetching job", error);
     toast.error("Job Was Not Added");

@@ -83,20 +83,6 @@
         "contactEmail": "contact@ipsumlorem.com",
         "contactPhone": "555-555-5555"
       }
-    },
-    {
-      "id": "0c22",
-      "title": "Georgiana Morissette",
-      "type": "Remote",
-      "location": "Howe - Reichert",
-      "description": "Laudantium ut eos magnam consequuntur aliquid.",
-      "salary": "$175K - $200K",
-      "company": {
-        "name": "Jerde - Hilpert",
-        "description": "Fahey - Nienow",
-        "contactEmail": "your.email+fakedata59805@gmail.com",
-        "contactPhone": "464-106-6411"
-      }
     }
   ]
 }

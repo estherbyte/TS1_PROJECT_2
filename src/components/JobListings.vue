@@ -4,7 +4,6 @@ import JobListing from "./JobListing.vue";
 import { reactive, defineProps, onMounted } from "vue";
 import PulseLoader from "vue-spinner/src/PulseLoader.vue";
 import axios from "axios";
-import jobs from "../jobs.json";
 
 defineProps({
   limit: Number,
@@ -21,20 +20,16 @@ const state = reactive({
 
 onMounted(async () => {
   try {
-    // fetch("jobs.json")
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     localStorage.setItem("jobs", JSON.stringify(data));
-    //     console.log("Data stored in localStorage");
-    //   })
-    //   .catch((error) => console.error("Error fetching data:", error));
-
-    // const response = await axios.get("/api/jobs");
-
-    localStorage.setItem("jobs", JSON.stringify(jobs));
-    state.jobs = JSON.parse(localStorage.getItem("jobs")).jobs;
-    console.log(state);
+    const response = await axios.get(
+      "https://api.jsonbin.io/v3/b/67a60d9ee41b4d34e485ba58",
+      {
+        headers: {
+          "X-Master-Key":
+            "$2a$10$c5MGscgxQjUnHNpLwou51uRj3zTJiCldQgSR2gkQNTmp/KYQsxiH6",
+        },
+      }
+    );
+    state.jobs = response.data.record.jobs;
   } catch (error) {
     console.error("Error fetching jobs", error);
   } finally {
@@ -47,7 +42,7 @@ onMounted(async () => {
   <section class="bg-blue-50 px-4 py-10">
     <div class="container-xl lg:container m-auto">
       <h2 class="text-3xl font-bold text-green-500 mb-6 text-center">
-        Browse Job
+        Browse Jobs
       </h2>
       <!--Show loading spinner while loading is true-->
       <div v-if="state.isLoading" class="text-center text-gray-500 py-6">
